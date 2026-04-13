@@ -1,0 +1,72 @@
+{
+  "odalar": [
+    {
+      "id": 1,
+      "adi": "Standart Oda",
+      "gorsel": "images/1.jpeg",
+      "kisi": 2,
+      "metrekare": 22,
+      "yatak": "Çift Kişilik",
+      "wifi": true,
+      "klima": true,
+      "aciklama": "Ada manzaralı, sakin ve ferah standart odamız iş ve kısa konaklamalar için ideal."
+    },
+    {
+      "id": 2,
+      "adi": "Deluxe Oda",
+      "gorsel": "images/2.jpeg",
+      "kisi": 3,
+      "metrekare": 32,
+      "yatak": "King Yatak",
+      "wifi": true,
+      "klima": true,
+      "aciklama": "Geniş yaşam alanı, premium nevresim ve balkon keyfiyle Deluxe deneyimi."
+    },
+    {
+      "id": 3,
+      "adi": "Suite",
+      "gorsel": "images/3.jpeg",
+      "kisi": 4,
+      "metrekare": 48,
+      "yatak": "Ayrı Oturma",
+      "wifi": true,
+      "klima": true,
+      "aciklama": "Ayrı oturma odası ve geniş banyosuyla aileler ve uzun konaklamalar için özel suite."
+    }
+  ],
+  "yorumlar": [
+    {
+      "isim": "Ayşe & Mehmet Y.",
+      "yorum": "Ada havasının huzuru ve Nova Hotel'in misafirperverliği bir araya gelince unutulmaz bir tatil deneyimi yaşadık. Kesinlikle tekrar geleceğiz.",
+      "point": 5
+    },
+    {
+      "isim": "Ali K.",
+      "yorum": "İş seyahati için ideal bir adres. Sessiz odalar ve profesyonel hizmet. Kahvaltı muhteşemdi!",
+      "point": 5
+    },
+    {
+      "isim": "Zeynep D.",
+      "yorum": "Romantik bir hafta sonu geçirdik. Manzara nefes kesici, personel çok ilgili. Tavsiye ederim.",
+      "point": 5
+    },
+    {
+      "isim": "Can Ö.",
+      "yorum": "Spa ve havuz alanları harika. Tek eksiği konum biraz uzak ama buna değer.",
+      "point": 4
+    },
+    {
+      "isim": "Elif S.",
+      "yorum": "Ailece geldik, çocuklar için de uygun. Temiz ve ferah odalar.",
+      "point": 5
+    }
+  ],
+  "galeri": [
+    { "src": "images/1.jpeg", "aciklama": "Deluxe Oda" },
+    { "src": "images/2.jpeg", "aciklama": "İç Mekan" },
+    { "src": "images/3.jpeg", "aciklama": "Spa Merkezi" },
+    { "src": "images/4.jpeg", "aciklama": "Restaurant" },
+    { "src": "images/5.jpeg", "aciklama": "Manzara" },
+    { "src": "images/6.jpeg", "aciklama": "Havuz" }
+  ]
+}
