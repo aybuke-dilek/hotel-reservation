@@ -1,6 +1,167 @@
 ﻿<?php
 require_once __DIR__ . '/db.php';
 $rezervasyon_girisli = !empty($_SESSION['user_id']);
+$dolu_odalar = [];
+$rezervasyon_hata = '';
+
+function kolonuBul(array $alanlar, array $alternatifler): ?string {
+    foreach ($alternatifler as $alan) {
+        if (in_array($alan, $alanlar, true)) {
+            return $alan;
+        }
+    }
+    return null;
+}
+
+function rezervasyonKolonlariniGetir(?mysqli $mysqli): array {
+    if (!($mysqli instanceof mysqli) || $mysqli->connect_errno) {
+        return [];
+    }
+    $alanlar = [];
+    $kolonSonuc = $mysqli->query("SHOW COLUMNS FROM rezervasyonlar");
+    if (!($kolonSonuc instanceof mysqli_result)) {
+        return [];
+    }
+    while ($satir = $kolonSonuc->fetch_assoc()) {
+        $alan = (string)($satir['Field'] ?? '');
+        if ($alan !== '') {
+            $alanlar[] = $alan;
+        }
+    }
+    $kolonSonuc->free();
+    return $alanlar;
+}
+
+if ($rezervasyon_girisli && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!($mysqli instanceof mysqli) || $mysqli->connect_errno) {
+        $rezervasyon_hata = 'Veritabani baglantisi kurulamadigi icin rezervasyon kaydedilemedi.';
+    } else {
+        $alanlar = rezervasyonKolonlariniGetir($mysqli);
+        $musteriKolon = kolonuBul($alanlar, ['musteri_adi', 'ad_soyad', 'adsoyad', 'isim', 'ad']);
+        $odaKolon = kolonuBul($alanlar, ['oda_tipi', 'oda', 'room_type']);
+        $girisKolon = kolonuBul($alanlar, ['giris_tarihi', 'giris', 'check_in', 'checkin']);
+        $cikisKolon = kolonuBul($alanlar, ['cikis_tarihi', 'cikis', 'check_out', 'checkout']);
+        $toplamKolon = kolonuBul($alanlar, ['toplam_fiyat', 'toplam_ucret', 'toplam', 'fiyat', 'total_price']);
+        $durumKolon = kolonuBul($alanlar, ['durum', 'status']);
+        $userIdKolon = kolonuBul($alanlar, ['user_id', 'kullanici_id', 'uye_id']);
+        $odaNoKolon = kolonuBul($alanlar, ['oda_no', 'oda_numarasi', 'odaNumarasi', 'room_no', 'room_number']);
+        $telefonKolon = kolonuBul($alanlar, ['telefon', 'phone', 'telefon_no']);
+        $epostaKolon = kolonuBul($alanlar, ['eposta', 'email', 'mail', 'musteri_email']);
+        $yetiskinKolon = kolonuBul($alanlar, ['yetiskin', 'adults', 'yetiskin_sayisi']);
+        $cocukKolon = kolonuBul($alanlar, ['cocuk', 'children', 'cocuk_sayisi']);
+
+        if (!$musteriKolon || !$odaKolon || !$girisKolon || !$cikisKolon || !$toplamKolon) {
+            $rezervasyon_hata = 'Rezervasyon tablosunda gerekli kolonlar eksik. Lutfen tabloyu guncelleyin.';
+        } else {
+            $giris = trim((string)($_POST['giris'] ?? ''));
+            $cikis = trim((string)($_POST['cikis'] ?? ''));
+            $odaTip = trim((string)($_POST['odaTip'] ?? 'standart'));
+            $odaNo = (int)($_POST['odaNo'] ?? 0);
+            $yetiskin = (int)($_POST['yetiskin'] ?? 1);
+            $cocuk = (int)($_POST['cocuk'] ?? 0);
+            $telefon = trim((string)($_POST['telefon'] ?? ''));
+            $eposta = trim((string)($_POST['eposta'] ?? ''));
+
+            $tipAdlari = [
+                'standart' => 'Standart Oda',
+                'deluxe' => 'Deluxe Oda',
+                'suite' => 'Suite',
+            ];
+            $tipFiyatlari = [
+                'standart' => 3200,
+                'deluxe' => 4800,
+                'suite' => 7200,
+            ];
+            $manzara = trim((string)($_POST['manzara'] ?? 'kara'));
+            $odaTipEtiket = $tipAdlari[$odaTip] ?? 'Standart Oda';
+            $gecelik = $tipFiyatlari[$odaTip] ?? 3200;
+            if ($manzara === 'deniz') {
+                $gecelik = (int)round($gecelik * 1.2);
+            }
+
+            $girisTs = strtotime($giris);
+            $cikisTs = strtotime($cikis);
+            $gece = ($girisTs && $cikisTs) ? (int)floor(($cikisTs - $girisTs) / 86400) : 0;
+            if (!$girisTs || !$cikisTs || $gece <= 0 || $odaNo <= 0) {
+                $rezervasyon_hata = 'Tarih veya oda bilgisi gecersiz. Lutfen formu tekrar kontrol edin.';
+            } else {
+                $toplam = $gecelik * $gece;
+                $musteriAdi = (string)($_SESSION['user_name'] ?? '');
+                if ($musteriAdi === '') {
+                    $musteriAdi = trim((string)($_POST['adSoyad'] ?? 'Misafir'));
+                }
+                $odaMetni = $odaTipEtiket . ' - Oda ' . $odaNo;
+
+                $sql = 'INSERT INTO rezervasyonlar (`' . $musteriKolon . '`, `' . $odaKolon . '`, `' . $girisKolon . '`, `' . $cikisKolon . '`, `' . $toplamKolon . '`) VALUES (?, ?, ?, ?, ?)';
+                $stmt = $mysqli->prepare($sql);
+                if (!$stmt) {
+                    $rezervasyon_hata = 'Rezervasyon kaydi olusturulamadi (sorgu hazirlanamadi).';
+                } else {
+                    $girisDb = date('Y-m-d', $girisTs);
+                    $cikisDb = date('Y-m-d', $cikisTs);
+                    $stmt->bind_param('ssssd', $musteriAdi, $odaMetni, $girisDb, $cikisDb, $toplam);
+                    if ($stmt->execute()) {
+                        $stmt->close();
+                        header('Location: rezervasyonlarim.php?rez=ok');
+                        exit;
+                    }
+                    $stmt->close();
+                    $rezervasyon_hata = 'Rezervasyon kaydi veritabanina yazilamadi.';
+                }
+            }
+        }
+    }
+}
+
+if ($rezervasyon_girisli && $mysqli instanceof mysqli && !$mysqli->connect_errno) {
+    $durumKolon = null;
+    $odaNoKolon = null;
+    $odaKolon = null;
+    $alanlar = rezervasyonKolonlariniGetir($mysqli);
+    if (!empty($alanlar)) {
+        $durumKolon = kolonuBul($alanlar, ['durum', 'status']);
+        $odaNoKolon = kolonuBul($alanlar, ['oda_no', 'oda_numarasi', 'odaNumarasi', 'room_no', 'room_number']);
+        $odaKolon = kolonuBul($alanlar, ['oda_tipi', 'oda', 'room_type']);
+    }
+
+    if ($durumKolon && ($odaNoKolon || $odaKolon)) {
+        $secilenKolonlar = [];
+        if ($odaNoKolon) {
+            $secilenKolonlar[] = "`$odaNoKolon` AS oda_no";
+        } else {
+            $secilenKolonlar[] = "NULL AS oda_no";
+        }
+        if ($odaKolon) {
+            $secilenKolonlar[] = "`$odaKolon` AS oda_text";
+        } else {
+            $secilenKolonlar[] = "NULL AS oda_text";
+        }
+        $sql = "SELECT " . implode(', ', $secilenKolonlar) . " FROM rezervasyonlar WHERE `$durumKolon` = 'Onaylandi'";
+        $sonuc = $mysqli->query($sql);
+        if ($sonuc instanceof mysqli_result) {
+            while ($satir = $sonuc->fetch_assoc()) {
+                $adaylar = [];
+                if (!empty($satir['oda_no'])) {
+                    $adaylar[] = (string)$satir['oda_no'];
+                }
+                if (!empty($satir['oda_text'])) {
+                    $adaylar[] = (string)$satir['oda_text'];
+                }
+                foreach ($adaylar as $aday) {
+                    if (preg_match_all('/\b\d{3,4}\b/u', $aday, $eslesme)) {
+                        foreach ($eslesme[0] as $numaraStr) {
+                            $numara = (int)$numaraStr;
+                            if ($numara > 0) {
+                                $dolu_odalar[$numara] = true;
+                            }
+                        }
+                    }
+                }
+            }
+            $sonuc->free();
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="tr">
@@ -13,7 +174,7 @@ $rezervasyon_girisli = !empty($_SESSION['user_id']);
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=20260420-1">
 </head>
 <body class="alt-page rezervasyon-page">
 
@@ -36,8 +197,19 @@ $rezervasyon_girisli = !empty($_SESSION['user_id']);
 </div>
 </section>
 <?php else: ?>
+<?php if ($rezervasyon_hata !== ''): ?>
+<section class="rez-giris-uyari" aria-live="polite">
+<div class="rez-giris-uyari-icerik">
+<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+<div>
+<h2>Rezervasyon kaydedilemedi</h2>
+<p><?php echo htmlspecialchars($rezervasyon_hata, ENT_QUOTES, 'UTF-8'); ?></p>
+</div>
+</div>
+</section>
+<?php endif; ?>
 
-<main class="rezervasyon-shell" id="rezervasyonApp">
+<main class="rezervasyon-shell" id="rezervasyonApp" data-dolu-odalar="<?php echo htmlspecialchars(json_encode(array_map('intval', array_keys($dolu_odalar)), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8'); ?>">
 <aside class="rez-ozet" data-aos="fade-right" aria-labelledby="rez-ozet-baslik">
 <h2 id="rez-ozet-baslik">Seçim Özeti</h2>
 <p class="rez-ozet-alt">Seçimleriniz kaybolmaz; adımlar arasında güncellenir.</p>
@@ -78,7 +250,7 @@ $rezervasyon_girisli = !empty($_SESSION['user_id']);
 </div>
 </div>
 
-<form class="rez-form" id="rezForm" action="#" method="get" novalidate>
+<form class="rez-form" id="rezForm" action="rezervasyon.php" method="post" novalidate>
 <div class="rez-stepper-ust">
 <div class="rez-adimlar" role="tablist" aria-label="Rezervasyon adımları">
 <button type="button" class="rez-adim aktif" data-step="1" role="tab" aria-selected="true" id="tab-step-1"><span class="rez-adim-no">1</span><span class="rez-adim-txt">Tarih &amp; misafir</span></button>

@@ -1750,6 +1750,15 @@ footer{
     min-height:88px;
 }
 
+.rez-adim-panel select option[disabled][data-dolu="1"]{
+    color:#b91c1c;
+    background:#fee2e2;
+}
+
+.rez-adim-panel select option[disabled]{
+    color:#9ca3af;
+}
+
 .rez-yardim{
     font-size:12px;
     color:#64748b;
@@ -2006,11 +2015,41 @@ footer{
 .nav-user-area{
     display:flex;
     align-items:center;
-    gap:14px;
+    gap:10px;
     flex-shrink:0;
     margin-left:clamp(8px, 1.5vw, 20px);
     padding-left:clamp(18px, 2.2vw, 32px);
     border-left:1px solid rgba(255,255,255,0.28);
+    align-self:center;
+}
+
+.nav-user-dropdown{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.nav-user-toggle{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    border:none;
+    background:transparent;
+    padding:0;
+    cursor:pointer;
+    font-family:inherit;
+    color:#fff;
+}
+
+.nav-user-toggle .fa-chevron-down{
+    color:rgba(255,255,255,0.78);
+    font-size:0.8rem;
+    transition:transform 0.2s ease;
+}
+
+.nav-user-dropdown.is-open .nav-user-toggle .fa-chevron-down{
+    transform:rotate(180deg);
 }
 
 .nav-hosgeldin{
@@ -2048,6 +2087,103 @@ footer{
 .nav-hosgeldin strong{
     font-weight:600;
     color:#ffffff;
+}
+
+.nav-user-menu{
+    position:absolute;
+    top:100%;
+    right:0;
+    min-width:220px;
+    margin-top:10px;
+    background:#1a252f;
+    border:1px solid #c5a059;
+    border-radius:8px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.4);
+    padding:10px 0;
+    display:none;
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(8px);
+    pointer-events:none;
+    transition:opacity 0.24s ease, transform 0.24s ease, visibility 0.24s ease;
+    z-index:9999;
+}
+
+.nav-user-dropdown.is-open .nav-user-menu{
+    display:block;
+    opacity:1;
+    visibility:visible;
+    transform:translateY(0);
+    pointer-events:auto;
+}
+
+.nav-user-dropdown:hover .nav-user-menu,
+.nav-user-dropdown:focus-within .nav-user-menu{
+    display:block;
+    opacity:1;
+    visibility:visible;
+    transform:translateY(0);
+    pointer-events:auto;
+}
+
+.nav-user-menu,
+.nav-user-menu *{
+    text-decoration:none !important;
+    color:#ffffff !important;
+}
+
+.nav-user-menu-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    width:100%;
+    box-sizing:border-box;
+    padding:12px 20px;
+    border-radius:0;
+    font-size:14px;
+    font-weight:500;
+    transition:0.3s;
+    line-height:1.3;
+}
+
+.nav-user-menu-item i{
+    width:18px;
+    margin-right:10px;
+    color:#c5a059 !important;
+}
+
+.nav-user-menu-item:hover{
+    background:#c5a059;
+    color:#1a252f !important;
+}
+
+.nav-user-menu-item:hover i{
+    color:#1a252f !important;
+}
+
+.nav-user-menu-item--logout i{
+    color:#f87171;
+}
+
+.nav-user-menu-item--logout:hover{
+    background:#c5a059;
+    color:#1a252f !important;
+}
+
+/* Yüksek özgüllük: global link stilleri dropdown'u bozmasın */
+.header-nav .nav-user-menu a.nav-user-menu-item{
+    display:flex !important;
+    align-items:center !important;
+    gap:10px !important;
+    width:100% !important;
+    padding:12px 20px !important;
+    color:#fff !important;
+    text-decoration:none !important;
+}
+
+.header-nav .nav-user-menu a.nav-user-menu-item:hover{
+    background:#c5a059 !important;
+    color:#1a252f !important;
 }
 
 .nav-giris{
@@ -2137,6 +2273,140 @@ footer{
 
 .nav-cikis::after{
     display:none !important;
+}
+
+.hesap-shell{
+    max-width:1100px;
+    margin:0 auto;
+    padding:44px 24px 76px;
+}
+
+.hesap-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:26px;
+}
+
+.hesap-card{
+    background:#ffffff;
+    border:1px solid #e2e8f0;
+    border-top:3px solid #c5a059;
+    border-radius:14px;
+    box-shadow:0 10px 34px rgba(15,23,42,0.07);
+    padding:26px 24px 24px;
+}
+
+.hesap-card--full{
+    max-width:720px;
+    margin:0 auto;
+}
+
+.hesap-card h2{
+    margin:0 0 18px;
+    font-family:'Playfair Display', serif;
+    font-size:1.35rem;
+    color:#1e293b;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.hesap-card h2 i{
+    color:#c5a059;
+    font-size:1rem;
+}
+
+.hesap-form label{
+    display:block;
+    margin:0 0 7px;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:#334155;
+}
+
+.hesap-form input{
+    width:100%;
+    box-sizing:border-box;
+    padding:12px 14px;
+    margin-bottom:16px;
+    border:1px solid #cbd5e1;
+    border-radius:8px;
+    font-family:'Inter', sans-serif;
+    font-size:15px;
+    color:#1e293b;
+    background:#ffffff;
+}
+
+.hesap-form input:focus{
+    outline:none;
+    border-color:#c5a059;
+    box-shadow:0 0 0 3px rgba(197,160,89,0.2);
+}
+
+.hesap-form input[disabled]{
+    background:#f8fafc;
+    color:#64748b;
+}
+
+.hesap-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    margin-top:8px;
+    padding:12px 22px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:linear-gradient(135deg, #c5a059 0%, #a68442 100%);
+    color:#fff;
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    text-decoration:none;
+    box-shadow:0 6px 18px rgba(197,160,89,0.35);
+    transition:transform 0.15s, box-shadow 0.2s;
+}
+
+.hesap-btn:hover{
+    transform:translateY(-1px);
+    box-shadow:0 8px 22px rgba(166,132,66,0.4);
+}
+
+.hesap-btn--link{
+    margin-top:2px;
+}
+
+.hesap-alert{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:12px 14px;
+    border-radius:10px;
+    margin:0 0 18px;
+    border:1px solid transparent;
+    font-size:14px;
+}
+
+.hesap-alert--hata{
+    background:#fef2f2;
+    color:#991b1b;
+    border-color:#fecaca;
+}
+
+.hesap-alert--ok{
+    background:#ecfdf5;
+    color:#065f46;
+    border-color:#a7f3d0;
+}
+
+.hesap-aciklama{
+    margin:0 0 20px;
+    color:#475569;
+    line-height:1.65;
 }
 
 /* Auth sayfası — premium tam ekran */
@@ -2567,6 +2837,14 @@ body.auth-page{
         border-left:none;
         border-top:1px solid rgba(255,255,255,0.2);
     }
+    .nav-user-menu{
+        right:0;
+        left:auto;
+        min-width:min(92vw, 280px);
+    }
+    .nav-user-dropdown.is-open .nav-user-menu{
+        transform:translateY(0);
+    }
     .nav-hosgeldin{
         max-width:min(100%, 320px);
         font-size:12px;
@@ -2578,6 +2856,12 @@ body.auth-page{
     .nav-cikis{
         font-size:12px;
         padding:9px 16px 9px 14px;
+    }
+    .hesap-shell{
+        padding:32px 18px 56px;
+    }
+    .hesap-grid{
+        grid-template-columns:1fr;
     }
     .auth-kart{ padding:28px 22px 26px; }
     .auth-govselli{ padding-top:88px; }
@@ -2598,4 +2882,491 @@ body.auth-page{
 @media (max-width: 768px){
     .hakkimizda-flex{ flex-direction:column; }
     .hakkimizda-gorsel{ order:-1; }
+}
+
+/* Navbar dropdown - hard override (cache/cascade safe) */
+header .header-nav .nav-user-area{
+    display:flex;
+    align-items:center;
+    align-self:center;
+}
+
+header .header-nav .nav-user-dropdown{
+    position:relative;
+    display:flex;
+    align-items:center;
+}
+
+header .header-nav .nav-user-toggle{
+    display:flex !important;
+    align-items:center !important;
+    gap:10px !important;
+    background:transparent !important;
+    border:none !important;
+    color:#fff !important;
+    text-decoration:none !important;
+    cursor:pointer;
+}
+
+header .header-nav .nav-user-menu{
+    position:absolute !important;
+    right:0 !important;
+    top:100% !important;
+    margin-top:10px !important;
+    min-width:220px !important;
+    padding:10px 0 !important;
+    border-radius:8px !important;
+    background:#1a252f !important;
+    border:1px solid #c5a059 !important;
+    box-shadow:0 10px 25px rgba(0,0,0,0.4) !important;
+    z-index:9999 !important;
+    display:none !important;
+}
+
+header .header-nav .nav-user-dropdown.is-open .nav-user-menu{
+    display:block !important;
+}
+
+header .header-nav .nav-user-menu a.nav-user-menu-item{
+    display:flex !important;
+    align-items:center !important;
+    gap:10px !important;
+    width:100% !important;
+    box-sizing:border-box !important;
+    padding:12px 20px !important;
+    color:#fff !important;
+    text-decoration:none !important;
+}
+
+header .header-nav .nav-user-menu a.nav-user-menu-item:visited{
+    color:#fff !important;
+    text-decoration:none !important;
+}
+
+header .header-nav .nav-user-menu a.nav-user-menu-item i{
+    margin-right:10px !important;
+    color:#c5a059 !important;
+}
+
+header .header-nav .nav-user-menu a.nav-user-menu-item:hover{
+    background:#c5a059 !important;
+    color:#1a252f !important;
+}
+
+header .header-nav .nav-user-menu a.nav-user-menu-item:hover i{
+    color:#1a252f !important;
+}
+
+/* ADMIN - login + panel */
+body.admin-login-page,
+body.admin-panel-page{
+    background:
+        radial-gradient(circle at 15% 12%, rgba(197,160,89,0.1), transparent 38%),
+        radial-gradient(circle at 84% 90%, rgba(197,160,89,0.08), transparent 40%),
+        linear-gradient(155deg, #0b1324 0%, #15243d 48%, #0a101d 100%);
+    color:#e2e8f0;
+    min-height:100vh;
+}
+
+.admin-login-wrap{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px 16px;
+    box-sizing:border-box;
+}
+
+.admin-login-card{
+    width:100%;
+    max-width:440px;
+    background:linear-gradient(165deg, rgba(17,24,39,0.94) 0%, rgba(15,23,42,0.92) 100%);
+    border:1px solid rgba(197,160,89,0.34);
+    border-radius:16px;
+    box-shadow:0 26px 62px rgba(2,8,23,0.52), 0 0 0 1px rgba(255,255,255,0.04) inset;
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    padding:34px 30px;
+}
+
+.admin-login-kicker{
+    margin:0 0 6px;
+    color:#c5a059;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+}
+
+.admin-login-card h1{
+    margin:0 0 8px;
+    color:#f8fafc;
+    font-size:2.05rem;
+    letter-spacing:0.02em;
+}
+
+.admin-login-subtitle{
+    margin:0 0 20px;
+    color:#94a3b8;
+    font-size:14px;
+}
+
+.admin-login-form label{
+    display:block;
+    margin:0 0 6px;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:#cbd5e1;
+}
+
+.admin-login-form input{
+    width:100%;
+    box-sizing:border-box;
+    padding:12px 14px;
+    margin-bottom:16px;
+    border:1px solid #3a4b61;
+    border-radius:8px;
+    background:#0a1324;
+    color:#f8fafc;
+    font-size:15px;
+}
+
+.admin-login-form input:focus{
+    outline:none;
+    border-color:#c5a059;
+    box-shadow:0 0 0 3px rgba(197,160,89,0.22);
+}
+
+.admin-login-form button{
+    width:100%;
+    border:none;
+    border-radius:8px;
+    padding:13px 16px;
+    background:linear-gradient(135deg, #d3b26c 0%, #b28e49 100%);
+    color:#fff;
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+}
+
+.admin-login-form button:hover{
+    background:linear-gradient(135deg, #dec07b 0%, #be9a56 100%);
+}
+
+.admin-topbar{
+    background:linear-gradient(90deg, #05070d 0%, #0f172a 55%, #05070d 100%);
+    color:#fff;
+    padding:16px 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    font-size:14px;
+    border-bottom:1px solid rgba(197,160,89,0.42);
+    box-shadow:0 6px 20px rgba(0,0,0,0.32);
+    position:relative;
+    top:auto;
+    left:auto;
+    right:auto;
+    z-index:1;
+}
+
+.admin-topbar-brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.admin-topbar-logo{
+    color:#f8fafc;
+    font-size:11px;
+    letter-spacing:0.16em;
+    font-weight:700;
+}
+
+.admin-topbar-sep{
+    width:28px;
+    height:1px;
+    background:linear-gradient(90deg, rgba(197,160,89,0.15), rgba(197,160,89,0.95), rgba(197,160,89,0.15));
+}
+
+.admin-topbar strong{
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:#c5a059;
+}
+
+.admin-topbar-exit{
+    color:#f8fafc;
+    text-decoration:none;
+    font-weight:600;
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    border:1px solid rgba(197,160,89,0.35);
+    border-radius:999px;
+    padding:8px 14px;
+    background:rgba(197,160,89,0.1);
+    transition:all 0.2s ease;
+}
+
+.admin-topbar-exit:hover{
+    background:rgba(197,160,89,0.24);
+    border-color:rgba(197,160,89,0.68);
+    color:#ffffff;
+}
+
+.admin-panel-wrap{
+    max-width:1240px;
+    margin:0 auto;
+    padding:30px 20px 48px;
+}
+
+.admin-panel-card{
+    background:linear-gradient(170deg, rgba(17,24,39,0.9) 0%, rgba(15,23,42,0.94) 100%);
+    border:1px solid rgba(197,160,89,0.34);
+    border-radius:16px;
+    box-shadow:0 24px 54px rgba(2,8,23,0.45), 0 0 0 1px rgba(255,255,255,0.03) inset;
+    padding:26px;
+}
+
+.admin-panel-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:18px;
+}
+
+.admin-panel-card h1{
+    margin:0;
+    color:#f8fafc;
+    font-size:1.9rem;
+    letter-spacing:0.01em;
+}
+
+.admin-count-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:8px 12px;
+    border-radius:999px;
+    border:1px solid rgba(197,160,89,0.45);
+    background:rgba(197,160,89,0.12);
+    color:#ead4a3;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+}
+
+.admin-feedback{
+    margin:0 0 14px;
+    padding:12px 14px;
+    border-radius:8px;
+    border:1px solid transparent;
+    font-size:14px;
+}
+
+.admin-feedback--error{
+    background:#3b1616;
+    border-color:#7f1d1d;
+    color:#fecaca;
+}
+
+.admin-feedback--success{
+    background:#052e21;
+    border-color:#065f46;
+    color:#a7f3d0;
+}
+
+.admin-table-wrap{
+    overflow-x:auto;
+}
+
+.admin-table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    min-width:760px;
+    background:#0b1220;
+    border:1px solid #23344d;
+    border-radius:12px;
+    overflow:hidden;
+}
+
+.admin-table th,
+.admin-table td{
+    border-bottom:1px solid #1e2d44;
+    padding:13px 12px;
+    font-size:14px;
+    color:#e2e8f0;
+    text-align:left;
+    vertical-align:middle;
+}
+
+.admin-table th{
+    background:linear-gradient(180deg, #1f2f47 0%, #19263b 100%);
+    color:#f8fafc;
+    font-weight:600;
+    font-size:12px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+}
+
+.admin-table tbody tr{
+    transition:background 0.18s ease;
+}
+
+.admin-table tbody tr:hover{
+    background:rgba(37,99,235,0.08);
+}
+
+.admin-table tbody tr:last-child td{
+    border-bottom:none;
+}
+
+.admin-table-empty{
+    color:#94a3b8;
+    font-size:13px;
+}
+
+.admin-action-form{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.admin-durum{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.03em;
+    border:1px solid transparent;
+}
+
+.admin-durum--onayli{
+    color:#86efac;
+    background:rgba(22,163,74,0.2);
+    border-color:rgba(34,197,94,0.5);
+}
+
+.admin-durum--reddedildi{
+    color:#fca5a5;
+    background:rgba(220,38,38,0.2);
+    border-color:rgba(239,68,68,0.5);
+}
+
+.admin-durum--beklemede{
+    color:#fcd34d;
+    background:rgba(234,179,8,0.16);
+    border-color:rgba(250,204,21,0.42);
+}
+
+/* Rezervasyonlarım - yatay kaydırmayı kaldır */
+body.rezervasyonlarim-page .admin-table-wrap{
+    overflow-x:hidden;
+}
+
+body.rezervasyonlarim-page .admin-table{
+    min-width:0;
+    width:100%;
+    table-layout:fixed;
+}
+
+body.rezervasyonlarim-page .admin-table th,
+body.rezervasyonlarim-page .admin-table td{
+    white-space:normal;
+    word-break:break-word;
+}
+
+/* Rezervasyonlarım - daha ferah yerleşim */
+body.rezervasyonlarim-page .hesap-card.hesap-card--full{
+    max-width:780px;
+    padding:30px 28px 24px;
+}
+
+body.rezervasyonlarim-page .hesap-card.hesap-card--full h2{
+    margin-bottom:22px;
+}
+
+body.rezervasyonlarim-page .hesap-alert{
+    margin-bottom:22px;
+    padding:14px 16px;
+}
+
+body.rezervasyonlarim-page .hesap-aciklama{
+    margin-bottom:24px;
+    line-height:1.75;
+}
+
+body.rezervasyonlarim-page .admin-table-wrap{
+    margin-bottom:18px;
+}
+
+body.rezervasyonlarim-page .admin-table th,
+body.rezervasyonlarim-page .admin-table td{
+    padding:15px 14px;
+}
+
+body.rezervasyonlarim-page .hesap-btn.hesap-btn--link{
+    margin-top:6px;
+    padding:13px 24px;
+}
+
+.admin-btn{
+    border:none;
+    border-radius:999px;
+    padding:8px 12px;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    color:#fff;
+    letter-spacing:0.03em;
+}
+
+.admin-btn--approve{
+    background:linear-gradient(135deg, #16a34a 0%, #166534 100%);
+}
+
+.admin-btn--approve:hover{
+    background:linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+}
+
+.admin-btn--reject{
+    background:linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+}
+
+.admin-btn--reject:hover{
+    background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+}
+
+@media (max-width: 768px){
+    .admin-topbar{
+        padding:14px 16px;
+    }
+    .admin-topbar-logo{
+        display:none;
+    }
+    .admin-topbar-sep{
+        display:none;
+    }
+    .admin-panel-wrap{
+        padding:20px 12px 36px;
+    }
+    .admin-panel-card{
+        padding:18px;
+    }
+    .admin-panel-head{
+        flex-direction:column;
+        align-items:flex-start;
+    }
 }

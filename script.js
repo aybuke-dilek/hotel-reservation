@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
 /* Rezervasyon sayfası (önceden rezervasyon.js) */
 (function () {
     var KAT_SAYISI = 10;
-    var ODA_KAT_BASINA = 300;
+    var ODA_KAT_ARALIK = 100;
 
     var MANZARA_ETIKET = { kara: 'Kara / Şehir', deniz: 'Deniz', havuz: 'Havuz' };
     var YATAK_ETIKET = { king: 'Tek büyük yatak (King)', twin: 'İki ayrı yatak (Twin)' };
@@ -272,8 +272,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function odaNumaralariKatIcin(kat) {
         var k = parseInt(kat, 10);
         if (k < 1 || k > KAT_SAYISI) return { bas: 0, bit: 0 };
-        var bas = (k - 1) * 100 + 101;
-        var bit = bas + ODA_KAT_BASINA - 1;
+        var bas = k * ODA_KAT_ARALIK;
+        var bit = bas + ODA_KAT_ARALIK;
         return { bas: bas, bit: bit };
     }
 
@@ -290,10 +290,23 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!selectEl) return;
         var ar = odaNumaralariKatIcin(kat);
         var html = '';
+        var ilkUygunDeger = '';
         for (var n = ar.bas; n <= ar.bit; n++) {
-            html += '<option value="' + n + '">Oda ' + n + '</option>';
+            var dolu = doluOdalarSet.has(n);
+            if (!dolu && !ilkUygunDeger) {
+                ilkUygunDeger = String(n);
+            }
+            html += '<option value="' + n + '"' + (dolu ? ' disabled data-dolu="1"' : '') + '>Oda ' + n + (dolu ? ' (Dolu)' : '') + '</option>';
+        }
+        if (!ilkUygunDeger) {
+            html = '<option value="" disabled selected>Bu katta boş oda yok</option>';
         }
         selectEl.innerHTML = html;
+        if (ilkUygunDeger) {
+            selectEl.value = ilkUygunDeger;
+        } else {
+            selectEl.value = '';
+        }
     }
 
     function geceSayisi(girisStr, cikisStr) {
@@ -406,6 +419,21 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     var currentStep = 1;
+    var doluOdalarSet = new Set();
+    var doluOdalarAttr = app.getAttribute('data-dolu-odalar');
+    if (doluOdalarAttr) {
+        try {
+            var doluOdalar = JSON.parse(doluOdalarAttr);
+            if (Array.isArray(doluOdalar)) {
+                doluOdalar.forEach(function (odaNo) {
+                    var numara = parseInt(odaNo, 10);
+                    if (!isNaN(numara) && numara > 0) {
+                        doluOdalarSet.add(numara);
+                    }
+                });
+            }
+        } catch (e) {}
+    }
 
     function setMinDates() {
         var bugun = new Date();
@@ -516,9 +544,24 @@ document.addEventListener('DOMContentLoaded', function() {
         var kat = el.kat ? el.kat.value : '1';
         odaNoSelectDoldur(el.odaNo, kat);
         var ar = odaNumaralariKatIcin(kat);
+        var doluSayisi = 0;
+        for (var n = ar.bas; n <= ar.bit; n++) {
+            if (doluOdalarSet.has(n)) doluSayisi++;
+        }
+        var toplamOda = Math.max(0, ar.bit - ar.bas + 1);
+        var bosSayisi = Math.max(0, toplamOda - doluSayisi);
         if (el.odaAralikYardim) {
             el.odaAralikYardim.textContent =
-                kat + '. kat: oda numaraları ' + ar.bas + ' — ' + ar.bit + ' (toplam ' + ODA_KAT_BASINA + ' oda).';
+                kat +
+                '. kat: oda numaraları ' +
+                ar.bas +
+                ' — ' +
+                ar.bit +
+                ' (dolu: ' +
+                doluSayisi +
+                ', boş: ' +
+                bosSayisi +
+                ').';
         }
         ozetiGuncelle();
     }
@@ -579,21 +622,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (el.form) {
         el.form.addEventListener('submit', function (e) {
-            e.preventDefault();
             if (!validateStep(1)) {
+                e.preventDefault();
                 showStep(1);
                 return;
             }
             if (!validateStep(2)) {
+                e.preventDefault();
                 showStep(2);
                 return;
             }
-            rezModalGoster(
-                'Teşekkürler! Rezervasyon talebiniz alındı (örnek simülasyon). Tahmini toplam: ' +
-                    (el.ozetToplam ? el.ozetToplam.textContent : '') +
-                    ' Resepsiyon en kısa sürede sizinle iletişime geçecektir.',
-                'basari'
-            );
         });
     }
 

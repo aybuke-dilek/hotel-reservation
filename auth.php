@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($email === '' || $sifre === '') {
             $auth_error = 'E-posta ve şifre girin.';
         } else {
-            $stmt = $mysqli->prepare('SELECT id, ad_soyad, sifre FROM users WHERE email = ? LIMIT 1');
+            $stmt = $mysqli->prepare('SELECT id, ad_soyad, email, sifre FROM users WHERE email = ? LIMIT 1');
             if ($stmt) {
                 $stmt->bind_param('s', $email);
                 $stmt->execute();
@@ -78,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     session_regenerate_id(true);
                     $_SESSION['user_id'] = (int) $row['id'];
                     $_SESSION['user_name'] = $row['ad_soyad'];
+                    $_SESSION['user_email'] = $row['email'];
                     $hedef = $donus !== '' ? $donus : 'index.php';
                     header('Location: ' . $hedef);
                     exit;
@@ -111,7 +112,7 @@ if (file_exists(__DIR__ . '/images/hotel.jpg')) {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=20260420-1">
 </head>
 <body class="alt-page auth-page"<?php echo $auth_bg !== '' ? ' style="--auth-bg-image:url(\'' . htmlspecialchars($auth_bg, ENT_QUOTES, 'UTF-8') . '\')"' : ''; ?>>
 
